@@ -1,0 +1,115 @@
+openapi: 3.0.0
+info:
+  title: Payment Gateway API
+  version: 1.0.0
+paths:
+  /api/v1/payments:
+    post:
+      summary: Processing a payment
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaymentRequest'
+      responses:
+        '201':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/payments/{payment_id}:
+    get:
+      summary: Retrieving a payment details
+      parameters:
+        - name: payment_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+components:
+  schemas:
+    PaymentRequest:
+      type: object
+      properties:
+        card_number:
+          type: string
+        expiry_month:
+          type: string
+        expiry_year:
+          type: string
+        currency:
+          type: string
+          enum:
+            - GBP
+            - USD
+            - CNY
+        amount:
+          type: integer
+        cvv:
+          type: string
+      required:
+        - card_number
+        - expiry_month
+        - expiry_year
+        - currency
+        - amount
+        - cvv
+    PaymentResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        status:
+          type: string
+          enum:
+            - AUTHORIZED
+            - DECLINED
+        card_last4:
+          type: string
+        expiry_month:
+          type: string
+        expiry_year:
+          type: string
+        currency:
+          type: string
+        amount:
+          type: integer
+    ErrorResponse:
+      type: object
+      properties:
+        message:
+          type: string
