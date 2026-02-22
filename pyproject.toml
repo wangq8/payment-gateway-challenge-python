@@ -11,6 +11,7 @@ uvicorn = "^0.41.0"
 gunicorn = "^25.1.0"
 fastapi = "^0.129.0"
 python-dotenv = "^1.2.1"
+pydantic-settings = "^2.13.1"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^9.0.2"

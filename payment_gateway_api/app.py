@@ -30,7 +30,7 @@ def get_validator() -> PaymentValidator:
 
 
 @app.exception_handler(RequestValidationError)
-async def basic_validation_handler(request: Request, exc: RequestValidationError):
+async def basic_validation_error_handler(request: Request, exc: RequestValidationError):
     errors = exc.errors()
     error_messages = []
     for error in errors:
@@ -45,7 +45,7 @@ async def basic_validation_handler(request: Request, exc: RequestValidationError
 
 
 @app.exception_handler(BusinessValidationError)
-async def business_validation_handler(request: Request, ex: BusinessValidationError):
+async def business_validation_error_handler(request: Request, ex: BusinessValidationError):
     return JSONResponse(
         status_code=status.HTTP_400_BAD_REQUEST,
         content=ErrorResponse(message=str(ex)).model_dump()
@@ -53,7 +53,7 @@ async def business_validation_handler(request: Request, ex: BusinessValidationEr
 
 
 @app.exception_handler(PaymentNotFoundError)
-async def not_found_handler(request: Request, ex: PaymentNotFoundError):
+async def payment_not_found_error_handler(request: Request, ex: PaymentNotFoundError):
     return JSONResponse(
         status_code=status.HTTP_404_NOT_FOUND,
         content=ErrorResponse(message=str(ex)).model_dump()
@@ -61,7 +61,7 @@ async def not_found_handler(request: Request, ex: PaymentNotFoundError):
 
 
 @app.exception_handler(PaymentServerError)
-async def business_validation_handler(request: Request, ex: PaymentServerError):
+async def payment_server_error_handler(request: Request, ex: PaymentServerError):
     return JSONResponse(
         status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         content=ErrorResponse(message=str(ex)).model_dump()
@@ -69,7 +69,7 @@ async def business_validation_handler(request: Request, ex: PaymentServerError):
 
 
 @app.exception_handler(BankServerError)
-async def business_validation_handler(request: Request, ex: BankServerError):
+async def bank_server_error_handler(request: Request, ex: BankServerError):
     return JSONResponse(
         status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
         content=ErrorResponse(message=str(ex)).model_dump()
