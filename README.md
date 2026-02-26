@@ -11,21 +11,22 @@ The API design document is: [payment_gateway_api.yaml](./payment_gateway_api.yam
 
 
 ## Key design considerations and assumptions
-* Use MVC, with app (controller), validator, service, model.
-* Use a dedicated `BankClient` to communicate with the external BankServer.
-* Use `FastAPI` coroutine (async, await) to improve performance.
-* Add `/api/v1` as prefix to for version.
-* `POST /payments` return 400 Bad Request if request is invalid.
-* `POST /payments` return all fields validation errors in one message.
-* `POST /payments` to return 201 Created if success instead of 200 Ok.
-* `GET /payments/{payment_id}` define `payment_id` to be UUID, avoid potential wrong format id.
-* If bank server return `4XX error`, return `500 Internal server error` to caller since it is not the client side issue, but the payment gateway server issue.
-* **DO NOT** expose the bank server response directly to caller.
-* **DO NOT** log sensitive information such as `card_number`, `cvv`.
-* To keep things simple, use an in memory set to allow only three currencies.
-* Externalize `Bank server URL` to `.env` to be configurable, easy to switch between dev,test,production.
-* Use enum for both `currency` and `status` in [payment_gateway_api.yaml](./payment_gateway_api.yaml) for caller easy to consume.
-* With unit test and integration test to ensure quality.
+* Framework: Use FastAPI async IO for better performance.
+* Framework: Use MVC
+* API side: Add /api/v1 and prefix for the API versioning.
+* API side: 201 for creation, 400 for Bad request, 500 for server error.
+* API: Used enum for the currency and status, for caller and developer easy to use - [payment_gateway_api.yaml](./payment_gateway_api.yaml)
+* MVC: separate a BankClient class for communicate with BankServer, for better structure.
+* MVC: for the validator, return all the validation errors in one response instead of return error one by one, it is easier for the caller to adjust the input one time.
+* MVC: use mapper to map the caller request to the bank request
+* Security: DO NOT log the sensitive information such as card_number, cvv
+* Security: DO NOT expose the response from bank server directly to the caller - need to hide the back end details.
+* Configure: As requirement said allow 3 currencies, used an in memory set to allow 3 allowed currencies, they can be externalized to a config file latter when needed.
+* Configure: Externalize the Bank server base URL to .env file to be configurable, easy to switch between dev, test, and production.
+* Test: With UT and integration test to ensure quality.
+* For the payment id, used an uuid since uuid is a random 128 bit ID, it is well format, impossible for collision, and widely used in industry as unique id for resources
+* Supposes already handle all 400 Bad Request error from Bank server, if still meet 400 Bad request from bank server, might be the "payment gateway" issue, should return 500 Internal Error.
+
 
 ## Possible enhance points
 * Supported currencies can be externalized to config file.
